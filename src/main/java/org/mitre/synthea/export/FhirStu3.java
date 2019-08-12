@@ -1,7 +1,6 @@
 package org.mitre.synthea.export;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -635,8 +634,8 @@ public class FhirStu3 {
         BundleEntryComponent providerOrganization = provider(bundle, encounter.provider);
         encounterResource.setServiceProvider(new Reference(providerOrganization.getFullUrl()));
       }
-    } else { // no associated provider, patient goes to ambulatory provider
-      Provider provider = person.getProvider(EncounterType.AMBULATORY, encounter.start);
+    } else { // no associated provider, patient goes to wellness provider
+      Provider provider = person.getProvider(EncounterType.WELLNESS, encounter.start);
       String providerFullUrl = findProviderUrl(provider, bundle);
 
       if (providerFullUrl != null) {
@@ -713,7 +712,7 @@ public class FhirStu3 {
     for (BundleEntryComponent entry : bundle.getEntry()) {
       if (entry.getResource().fhirType().equals("Practitioner")) {
         Practitioner doc = (Practitioner) entry.getResource();
-        if (doc.getIdentifierFirstRep().getValue().equals("" + clinician.seed)) {
+        if (doc.getIdentifierFirstRep().getValue().equals("" + clinician.identifier)) {
           return entry.getFullUrl();
         }
       }
@@ -909,7 +908,7 @@ public class FhirStu3 {
       inpatient = true;
       // Provider enum doesn't include outpatient, but it can still be
       // an encounter type.
-    } else if (type == EncounterType.AMBULATORY) {
+    } else if (type == EncounterType.AMBULATORY || type == EncounterType.WELLNESS) {
       outpatient = true;
     }
     ExplanationOfBenefit eob = new ExplanationOfBenefit();
@@ -2200,7 +2199,7 @@ public class FhirStu3 {
     Practitioner practitionerResource = new Practitioner();
 
     practitionerResource.addIdentifier().setSystem("http://hl7.org/fhir/sid/us-npi")
-    .setValue("" + clinician.seed);
+    .setValue("" + clinician.identifier);
     practitionerResource.setActive(true);
     practitionerResource.addName().setFamily(
         (String) clinician.attributes.get(Clinician.LAST_NAME))
