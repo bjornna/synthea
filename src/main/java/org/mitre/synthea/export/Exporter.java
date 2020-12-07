@@ -111,6 +111,15 @@ public abstract class Exporter {
         writeNewFile(outFilePath, bundleJson);
       }
     }
+    if(Boolean.parseBoolean(Config.get("exporter.openehr.export"))){
+
+      try {
+        OpenEhrFlatExporter.exportAll(person, fileTag, stopTime);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+    }
     if (Boolean.parseBoolean(Config.get("exporter.ccda.export"))) {
       String ccdaXml = CCDAExporter.export(person, stopTime);
       File outDirectory = getOutputFolder("ccda", person);

@@ -275,6 +275,7 @@ public class TextExporter {
     File outDirectory = Exporter.getOutputFolder("text", person);
     Path outFilePath = outDirectory.toPath().resolve(Exporter.filename(person, fileTag, "txt"));
     Files.write(outFilePath, textRecord, StandardOpenOption.CREATE_NEW);
+    System.out.println("Wrote to " + outFilePath);
   }
 
   /**
